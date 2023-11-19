@@ -1,0 +1,80 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Deployment</title>
+</head>
+<body>
+    <h1>Model Deployment</h1>
+
+    <!--html_form display-->
+    {{ form|safe }}
+
+    <p id="prediction-result"></p>
+
+    <!--JavaScript-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const predictButton = document.getElementById('predict-button');
+
+            predictButton.addEventListener('click', function () {
+                predict();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+    const predictButton = document.getElementById('predict-button');
+
+    if (predictButton) {
+        predictButton.addEventListener('click', function () {
+            predict();
+        });
+    } else {
+        console.error('Button not found');
+    }
+});
+
+function predict() {
+    // Collect form data and send a POST request to the /predict endpoint
+    const formData = {};
+
+    // Handle numeric input
+    const distanceInput = document.getElementsByName('distance')[0];
+    formData['distance'] = parseFloat(distanceInput.value);
+
+    const surgeMultiplierInput = document.getElementsByName('surge_multiplier')[0];
+    formData['surge_multiplier'] = parseFloat(surgeMultiplierInput.value);
+
+    // Handle dynamic selects
+    const dynamicSelects = document.querySelectorAll('select');
+    for (const select of dynamicSelects) {
+        const selectName = select.getAttribute('name');
+        const selectValue = select.value;
+        formData[selectName] = selectValue;
+    }
+
+    fetch('/model', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Response:', data); 
+
+        if (data && data.prediction !== undefined) {
+            const predictionResult = data.prediction;
+            document.getElementById('prediction-result').innerText = `Prediction: ${predictionResult}`;
+        } else {
+            console.error('Invalid response format:', data);
+            document.getElementById('prediction-result').innerText = 'N/A';
+    }
+});
+}
+    </script>
+</body>
+</html>

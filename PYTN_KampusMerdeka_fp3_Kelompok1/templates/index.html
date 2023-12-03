@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVDs Survivability Predictions</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CVDs Patient Survivability Prediction</h1>
+    
+    <form id="mlForm" action="/predict" method="post">
+
+        <label for="time">Time:</label>
+        <input type="number" name="time" required>
+
+        <label for="age">Age:</label>
+        <input type="number" name="age" required>
+
+        <label for="serum_creatinine">Serum Creatinine:</label>
+        <input type="text" name="serum_creatinine" id="serum_creatinine" required>
+
+        <label for="ejection_fraction">Ejection Fraction:</label>
+        <input type="text" name="ejection_fraction" id="ejection_fraction" required>
+
+        <label for="serum_sodium">Serum Sodium:</label>
+        <input type="text" name="serum_sodium" id="serum_sodium" required>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div id="result" class="d-none">
+        <h2>Model Predictions</h2>
+        <p><strong>Random Forest Prediction:</strong> <span id="rfPrediction"></span></p>
+        <p><strong>Gradient Boosting Prediction:</strong> <span id="gbPrediction"></span></p>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- JavaScript -->
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // DOM is fully loaded
+
+        document.getElementById('mlForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Fetch predictions using AJAX
+            fetch('/predict', {
+                method: 'POST',
+                body: new FormData(event.target),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the #rfPrediction and #gbPrediction elements with the predictions
+                document.getElementById('rfPrediction').innerText = data.rf_prediction;
+                document.getElementById('gbPrediction').innerText = data.gb_prediction;
+
+                // Show the #result div
+                document.getElementById('result').classList.remove('d-none');
+
+                // Update the URL to "/predict"
+                window.history.pushState({}, 'Predict Result', '/predict');
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
+
+</body>
+</html>
